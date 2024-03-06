@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
@@ -11,6 +13,10 @@ from deepgram import (
 )
 import requests
 
+# DEEPGRAM_API_KEY = os.getenv("DEEPGRAM")
+# OPENAI_API_KEY = os.getenv("OPEN_AI")
+
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -22,7 +28,7 @@ config = DeepgramClientOptions(
     options={"keepalive": "true"}
 )
 
-#logging.basicConfig(filename='app.log')
+# logging.basicConfig(filename='app.log')
 
 # Initialize Deepgram client and connection
 deepgram = DeepgramClient("", config)
@@ -31,6 +37,7 @@ dg_connection = deepgram.listen.live.v("1")
 # Track transcription state
 transcribing = False
 transcription_event = Event()
+
 
 def configure_deepgram():
     options = LiveOptions(
@@ -43,16 +50,20 @@ def configure_deepgram():
     )
     dg_connection.start(options)
 
+
 def start_microphone():
     microphone = Microphone(dg_connection.send)
     microphone.start()
     return microphone
+
 
 # # Later, you can save the transcriptions to a file or concatenate them into a string
 def save_transcriptions_to_file(file_path, transcriptions):
     with open(file_path, 'w') as file:
         for transcript in transcriptions:
             file.write(transcript + '\n')
+
+
 #
 # def save_transcriptions_to_file(file_path, data):
 #     with open(file_path, 'w') as file:
@@ -97,11 +108,11 @@ def start_transcription_loop():
             microphone.finish()
             dg_connection.finish()
             logging.info("Transcription loop finished.")
-            transcript = "\n".join(transcriptions)
+            another = "\n".join(transcriptions)
             # print(f"This is the transcript I generated for you: {transcript}")
-            ask_chat(transcript)
-            # print(transcriptions)
             save_transcriptions_to_file('transcriptions.txt', transcriptions)
+            ask_chat(another)
+            # print(transcriptions)
 
     except Exception as e:
         logging.error(f"Error: {e}")
@@ -133,9 +144,9 @@ Continue Client Relationship: I would maintain regular communication with the cl
         "temperature": 0.7
     }
     response = requests.post(url, headers=headers, json=data)
+    print(response.json())
     with open('follow-ups.txt', "w") as file:
         file.write(response.json()["choices"][0]["message"]["content"])
-
 
 
 def reconnect():
@@ -153,6 +164,7 @@ def reconnect():
         logging.error(f"Reconnection failed: {e}")
         return None
 
+
 def on_disconnect():
     logging.info("Client disconnected")
     global dg_connection
@@ -163,9 +175,11 @@ def on_disconnect():
     else:
         logging.info("No active dg_connection to disconnect from")
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/unlocked_intel')
 def new_analysis():
@@ -191,6 +205,12 @@ def new_analysis():
             else:
                 email_text.append(line.rstrip('\n'))  # Remove newline character
 
+    transcript = []
+
+    with open('transcriptions.txt', 'r') as file:
+        for line in file:
+            transcript.append(line.rstrip('\n'))  # Remove newline character
+
     # with open('follow-ups.txt', 'r') as file:
     #     file_content = file.read()
     #
@@ -206,12 +226,13 @@ def new_analysis():
     # print(email)
     # print(followups)
 
+    return render_template('unlocked.html', action_items=followups, email=email_text, transcription=transcript)
 
-    return render_template('unlocked.html', action_items=followups, email=email_text)
 
 @socketio.on('disconnect')
 def handle_disconnect():
     socketio.start_background_task(target=on_disconnect)
+
 
 @socketio.on('toggle_transcription')
 def toggle_transcription(data):
@@ -226,6 +247,7 @@ def toggle_transcription(data):
         # Stop transcription
         transcribing = False
         transcription_event.set()
+
 
 if __name__ == '__main__':
     logging.info("Starting SocketIO server.")

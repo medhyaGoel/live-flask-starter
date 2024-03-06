@@ -28,10 +28,11 @@
       <p>{{string}}</p>
       {% endfor %}
 
-    </div>
-    <h1>Call in</h1>
-    <div class="captions" id="captions">
-      <span>AI realtor assistant</span>
+      <h1>Call Transcript</h1>
+      {% for string in transcription %}
+      <p>{{string}}</p>
+      {% endfor %}
+
     </div>
     <div class="button-container">
       <a

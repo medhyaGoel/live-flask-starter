@@ -1,5 +1,3 @@
-import json
-
 from flask import Flask, render_template
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
@@ -117,10 +115,21 @@ def ask_chat(transcript):
     }
     data = {
         "model": "gpt-3.5-turbo",
-        "messages": [{"role": "user", "content": f"I'm a realtor. My client just called me. You are my secretary. List out what follow-up "
-                                                 f"actions I should take on behalf of my client based on this call "
-                                                 f"transcript under the heading 'FOLLOW-UP ITEMS'. Give me a call summary that I can email to my "
-                                                 f"client under the heading 'EMAIL'. Do not include any other information besides 'FOLLOW-UP ITEMS', the follow-up items, 'EMAIL', and the email. This is the call transcript: {transcript}"}],
+        "messages": [{"role": "user",
+                      "content": f"""I'm a realtor. Your client just called me. You are my secretary. 
+        Under the heading 'FOLLOW-UP ITEMS' list out what follow-up actions I should take after the call ends, on 
+        behalf of my client, informed by the call transcript below. Examples of follow-up items include: 
+        Property Research: If the client expressed interest in a specific property during the call, I would conduct 
+        additional research on the property to gather more detailed information. This may include reviewing property 
+        listings, assessing the property's condition, checking comparable sales data, and gathering any relevant 
+        documents or disclosures. Follow-Up Communication: Shortly after the call, I would send a follow-up email or text message to the client to 
+summarize our discussion, confirm any action items or appointments agreed upon, and express my availability to assist 
+further. Schedule Property Viewings: If the client expressed interest in viewing one or more properties, I would work with them to schedule appointments for property viewings at their convenience. I would coordinate with the property owners or listing agents to arrange the visits.
+Prepare Property Information Packets: For scheduled property viewings, I would prepare informational packets containing details about the properties, including photos, floor plans, property descriptions, and any relevant neighborhood information.
+Review Market Trends: I would review current market trends, recent property sales data, and local market conditions to provide the client with insights into property values, pricing strategies, and market dynamics.
+Follow-Up with Sellers: If the client expressed interest in selling their current property, I would follow up with them to discuss the selling process, market evaluation of their property, and steps to prepare their home for sale.
+Update Client Records: I would update my client database or CRM system with the details of the conversation, including any specific property preferences, contact information, and scheduled appointments. 
+Continue Client Relationship: I would maintain regular communication with the client to provide updates on new listings, market changes, and relevant information to support their real estate goals. Building a strong relationship with the client is essential for long-term success in real estate. Afterwards, write an email from me to my client containing a call summary and following up on items discussed during the call to remind them of how useful realtors are, under the heading 'EMAIL'. Do not include any other information besides 'FOLLOW-UP ITEMS', the follow-up items, 'EMAIL', and the email. This is the call transcript: {transcript}"""}],
         "temperature": 0.7
     }
     response = requests.post(url, headers=headers, json=data)

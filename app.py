@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, url_for
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
 import logging
@@ -12,6 +12,7 @@ from deepgram import (
     Microphone, LiveTranscriptionEvents,
 )
 import requests
+from send_email import *
 
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -117,6 +118,18 @@ def start_transcription_loop():
         logging.error(f"Error: {e}")
 
 
+@app.route('/submit_text', methods=['POST'])
+def submit_text():
+    if request.method == 'POST':
+        # Get the value of the text input field from the form
+        email_recipient = request.form['textInput']
+
+        # Do something with the text input, such as print it
+        drip_client(email_recipient)
+        print("email_sent")
+        return render_template()
+
+
 def ask_chat(transcript):
     url = "https://api.openai.com/v1/chat/completions"
     print(f"my openai API key is {OPENAI_API_KEY}")
@@ -197,37 +210,46 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/unlocked_intel')
+@app.route('/unlocked_intel', methods=['GET','POST'])
 def new_analysis():
-    followups = []
-    email_text = []
+    if request.method == 'POST':
+        # Get the value of the text input field from the form
+        email_recipient = request.form['textInput']
 
-    # Flag to indicate whether to start capturing lines
-    capture_followups = False
+        # Do something with the text input, such as print it
+        drip_client(email_recipient)
+        print("email_sent")
+        return redirect(url_for('index'))
+    else:
+        followups = []
+        email_text = []
 
-    with open('follow-ups.txt', 'r') as file:
-        for line in file:
-            if "FOLLOW-UP ITEMS" in line:
-                # Start capturing lines
-                capture_followups = True
-                continue
-            elif "EMAIL" in line:
-                # Stop capturing lines
-                capture_followups = False
-                continue
+        # Flag to indicate whether to start capturing lines
+        capture_followups = False
 
-            if capture_followups:
-                followups.append(line.rstrip('\n'))  # Remove newline character
-            else:
-                email_text.append(line.rstrip('\n'))  # Remove newline character
+        with open('follow-ups.txt', 'r') as file:
+            for line in file:
+                if "FOLLOW-UP ITEMS" in line:
+                    # Start capturing lines
+                    capture_followups = True
+                    continue
+                elif "EMAIL" in line:
+                    # Stop capturing lines
+                    capture_followups = False
+                    continue
 
-    transcript = []
+                if capture_followups:
+                    followups.append(line.rstrip('\n'))  # Remove newline character
+                else:
+                    email_text.append(line.rstrip('\n'))  # Remove newline character
 
-    with open('transcriptions.txt', 'r') as file:
-        for line in file:
-            transcript.append(line.rstrip('\n'))  # Remove newline character
+        transcript = []
 
-    return render_template('unlocked.html', action_items=followups, email=email_text, transcription=transcript)
+        with open('transcriptions.txt', 'r') as file:
+            for line in file:
+                transcript.append(line.rstrip('\n'))  # Remove newline character
+
+        return render_template('unlocked.html', action_items=followups, email=email_text, transcription=transcript)
 
 
 @socketio.on('disconnect')

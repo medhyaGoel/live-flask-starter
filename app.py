@@ -118,18 +118,6 @@ def start_transcription_loop():
         logging.error(f"Error: {e}")
 
 
-@app.route('/submit_text', methods=['POST'])
-def submit_text():
-    if request.method == 'POST':
-        # Get the value of the text input field from the form
-        email_recipient = request.form['textInput']
-
-        # Do something with the text input, such as print it
-        drip_client(email_recipient)
-        print("email_sent")
-        return render_template()
-
-
 def ask_chat(transcript):
     url = "https://api.openai.com/v1/chat/completions"
     print(f"my openai API key is {OPENAI_API_KEY}")

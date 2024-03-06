@@ -3,14 +3,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter");
 
 body {
-  color: white;
+  color: #ffffff;
   display: flex;
   align-items: center;
   font-family: "Inter", sans-serif;
   justify-content: center;
   flex-direction: column;
   height: 90vh;
-  background-color: #000;
+  background-color: #53298b;
   padding-top: 100px;
 }
 
@@ -48,6 +48,7 @@ body {
   -webkit-transform-style: preserve-3d;
   -moz-transform-style: preserve-3d;
   position: relative;
+  background-color: #000000;
 }
 
 .button-message,
@@ -60,7 +61,7 @@ body {
 .button-message {
   position: absolute;
   width: 50px;
-  color: #fff;
+  color: #ffffff;
   font-family: "Arimo", sans-serif;
   font-weight: 700;
   font-size: 25px;
@@ -145,7 +146,8 @@ body {
 }
 
 #captions {
-  color: rgb(237, 237, 242);
+  /* color: rgb(237, 237, 242); */
+  color: #ffffff;
   font-size: 24px;
   font-family: "Inter", sans-serif;
   margin: 10px 0;
@@ -183,7 +185,7 @@ h1 {
   color: white;
   position: relative;
   background-origin: border-box;
-  background-image: linear-gradient(90deg, #201cff -91.5%, #13ef95 80.05%);
+  background-image: linear-gradient(90deg, #53298b -91.5%, #13ef95 80.05%);
   box-shadow: 2px 1000px 1px var(--md-code-background) inset;
   z-index: 1;
 }
@@ -201,7 +203,7 @@ h1 {
 }
 
 .docs {
-  background-color: white;
+  background-color: #ffffff;
 }
 
 .docs::after {

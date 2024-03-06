@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Deepgram Test</title>
+    <title>Unlocked Intel</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -14,22 +14,20 @@
     ></script>
   </head>
   <body class="">
-    <div class="content">
-      <img class="click" src="../static/click.png" />
-      <div class="button-container">
-        <input type="checkbox" id="record" class="mic-checkbox" />
-        <label for="record" class="mic-button">
-          <div class="mic">
-            <div class="mic-button-loader"></div>
-            <div class="mic-base"></div>
-          </div>
-          <div class="button-message">
-            <span>&nbsp;</span>
-            <span> START/
-              END CALL</span>
-          </div>
-        </label>
-      </div>
+    <div class="">
+
+      <h1>Intelligence unlocked. Click on an icon below to follow-up on action items from your call.</h1>
+      <h2>Follow-up items:</h2>
+      {% for string in action_items %}
+      <p>{{string}}</p>
+      {% endfor %}
+      <br>
+
+      <h2>Email client: </h2>
+      {% for string in email %}
+      <p>{{string}}</p>
+      {% endfor %}
+
     </div>
     <h1>Call in</h1>
     <div class="captions" id="captions">
@@ -37,10 +35,10 @@
     </div>
     <div class="button-container">
       <a
-        href="/unlocked_intel"
+        href="/"
         class="info-button docs"
         target="_blank"
-        >Unlock Intelligence</a
+        >Record a new call</a
       >
     </div>
     <script src="../static/script.js"></script>

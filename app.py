@@ -37,6 +37,7 @@ def configure_deepgram():
         encoding="linear16",
         channels=1,
         sample_rate=16000,
+        diarize=True,
     )
     dg_connection.start(options)
 
@@ -44,6 +45,12 @@ def start_microphone():
     microphone = Microphone(dg_connection.send)
     microphone.start()
     return microphone
+
+# Later, you can save the transcriptions to a file or concatenate them into a string
+def save_transcriptions_to_file(file_path, transcriptions):
+    with open(file_path, 'w') as file:
+        for transcript in transcriptions:
+            file.write(transcript + '\n')
 
 def start_transcription_loop():
     try:
@@ -54,9 +61,11 @@ def start_transcription_loop():
             # Open a microphone stream
             microphone = start_microphone()
 
+            transcriptions = []
             def on_message(self, result, **kwargs):
                 transcript = result.channel.alternatives[0].transcript
                 if len(transcript) > 0:
+                    transcriptions.append(transcript)
                     socketio.emit('transcription_update', {'transcription': transcript})
 
             dg_connection.on(LiveTranscriptionEvents.Transcript, on_message)
@@ -69,6 +78,9 @@ def start_transcription_loop():
             microphone.finish()
             dg_connection.finish()
             logging.info("Transcription loop finished.")
+            save_transcriptions_to_file('transcriptions.txt', transcriptions)
+        
+
 
     except Exception as e:
         logging.error(f"Error: {e}")
